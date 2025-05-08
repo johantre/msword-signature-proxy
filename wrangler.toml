@@ -1,5 +1,4 @@
 name = "msword-signature-proxy"
-type = "javascript"
 account_id = "9581dc4a910dc7be926a65d026ddb128"
 main = "src/index.js"
 compatibility_date = "2024-05-01"
