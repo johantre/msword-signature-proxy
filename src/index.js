@@ -20,11 +20,15 @@ export default {
     const result = await uploadResponse.text();
     const json = JSON.parse(result);
 
-    return new Response(JSON.stringify(json), {
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Content-Type': 'application/json'
+    return new Response(
+      JSON.stringify({ success: true, data: result }),
+      {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+        }
       }
-    });
+    );
   }
 }
