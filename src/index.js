@@ -29,6 +29,11 @@ export default {
       const uploadFormData = new FormData();
       uploadFormData.append("files[]", file.stream(), file.name);
 
+      console.log("👀 Incoming form fields:");
+      for (const [name, value] of uploadFormData.entries()) {
+        console.log(" -", name, typeof value === "object" ? value.name : value);
+      }
+
       console.log("📤 Sending to Uguu...");
       const uguuResponse = await fetch("https://uguu.se/upload.php", {
         method: "POST",
