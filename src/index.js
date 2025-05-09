@@ -38,8 +38,8 @@ async function handleRequest(request) {
     const response = await sendToUguu(file);
 
     // Return the result
-    if (response.success && Array.isArray(data.files) && data.files.length > 0) {
-      const uploadedUrl = data.files[0].url;
+    if (response.success && Array.isArray(response.files) && response.files.length > 0) {
+      const uploadedUrl = response.files[0].url;
       console.log('📤 File uploaded successfully:', uploadedUrl);
       return new Response(JSON.stringify({ success: true, data: uploadedUrl }), {
         status: 200,
