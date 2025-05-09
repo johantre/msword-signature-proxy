@@ -1,0 +1,27 @@
+name: Tail Worker Logs
+
+on:
+  workflow_dispatch:
+
+jobs:
+  tail-logs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install Wrangler
+        run: npm install -g wrangler
+
+      - name: Tail logs from Cloudflare Worker (30s max)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          echo "::group::Starting wrangler tail (timeout 30s)"
+          timeout 30s wrangler tail || echo "tail ended"
+          echo "::endgroup::"
