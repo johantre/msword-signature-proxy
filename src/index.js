@@ -9,7 +9,14 @@ async function handleRequest(request) {
   try {
     // Only accept POST requests
     if (request.method !== 'POST') {
-      return new Response('Method Not Allowed', { status: 405 });
+        return new Response(JSON.stringify({
+            success: false,
+            errorcode: 405,
+            description: "Method Not Allowed"
+        }), {
+            status: 405,
+            headers: { "Content-Type": "application/json" }
+        });
     }
 
     // Parse the form data
@@ -47,7 +54,7 @@ async function handleRequest(request) {
 
   } catch (err) {
     console.log('Error:', err);
-    return new Response(JSON.stringify({ success: false, errorcode: 500, description: "Internal Server Error" }), {
+    return new Response(JSON.stringify({ success: false, errorcode: 500, description: "Upload failed: " + err.message }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
     });
