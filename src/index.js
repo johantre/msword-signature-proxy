@@ -36,7 +36,7 @@ async function handleRequest(request) {
 
     // Parse the form data
     const formData = await request.formData();
-    const file = formData.get('file');
+    const file = formData.get('files[]');
 
     // Ensure that a file has been provided
     if (!file) {
