@@ -69,7 +69,7 @@ async function handleRequest(request) {
  */
 async function sendToUguu(file) {
   const formData = new FormData();
-  formData.append("files[]", file.stream(), file.name);
+  formData.append("file", file.stream(), file.name);
 
   try {
     const response = await fetch("https://uguu.se/upload.php", {
