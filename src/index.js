@@ -85,6 +85,9 @@ async function sendToUguu(file) {
     const response = await fetch("https://uguu.se/upload", {
       method: "POST",
       body: formData,
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+      },
     });
 
     const text = await response.text();
