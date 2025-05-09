@@ -68,13 +68,16 @@ async function handleRequest(request) {
  * @returns {Object} - The response from Uguu
  */
 async function sendToUguu(file) {
+  console.log(file);
   const formData = new FormData();
-  formData.append("file", file.stream(), file.name);
-
+  formData.append("files[]", file.stream(), file.name);
   try {
     const response = await fetch("https://uguu.se/upload.php", {
       method: "POST",
       body: formData,
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      },
     });
 
     const text = await response.text();
