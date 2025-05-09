@@ -70,8 +70,17 @@ async function handleRequest(request) {
 async function sendToUguu(file) {
   console.log(file);
   const formData = new FormData();
-  formData.append("files[]", file, file.name);
+
+  const arrayBuffer = await file.arrayBuffer();
+  const blob = new Blob([arrayBuffer], { type: file.type });
+  formData.append("files[]", blob, file.name);
+
   console.log(formData);
+  console.log("🌐 Sending to Uguu with FormData:");
+  for (const [key, value] of formData.entries()) {
+    console.log(" →", key, value instanceof Blob ? `${value.type}, ${value.size} bytes` : value);
+  }
+
   try {
     const response = await fetch("https://uguu.se/upload", {
       method: "POST",
