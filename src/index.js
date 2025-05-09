@@ -46,8 +46,11 @@ async function handleRequest(request) {
     }
 
   } catch (err) {
-    console.error('Error:', err);
-    return new Response('Internal Server Error', { status: 500 });
+    console.log('Error:', err);
+    return new Response(JSON.stringify({ success: false, errorcode: 500, description: "Internal Server Error" }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 }
 
@@ -72,7 +75,7 @@ async function sendToUguu(file) {
 
     return JSON.parse(text);
   } catch (error) {
-    console.error("Error uploading file to Uguu:", error);
+    console.log("Error uploading file to Uguu:", error);
     return { success: false, errorcode: 500, description: "Error uploading to Uguu" };
   }
 }
