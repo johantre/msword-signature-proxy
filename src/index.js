@@ -6,17 +6,32 @@ addEventListener('fetch', event => {
 })
 
 async function handleRequest(request) {
+  const headers = {
+    'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin': '*',  // Sta verzoeken van elk domein toe
+    'Access-Control-Allow-Methods': 'POST, OPTIONS', // Sta POST en OPTIONS methoden toe
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization', // Sta specifieke headers toe
+  };
+
   try {
-    // Only accept POST requests
+    // CORS preflight verzoek (OPTIONS)
+    if (request.method === 'OPTIONS') {
+      return new Response(null, {
+        status: 204,
+        headers: headers,
+      });
+    }
+
+    // Alleen POST verzoeken accepteren
     if (request.method !== 'POST') {
-        return new Response(JSON.stringify({
-            success: false,
-            errorcode: 405,
-            description: "Method Not Allowed"
-        }), {
-            status: 405,
-            headers: { "Content-Type": "application/json" }
-        });
+      return new Response(JSON.stringify({
+          success: false,
+          errorcode: 405,
+          description: "Method Not Allowed"
+      }), {
+          status: 405,
+          headers: headers,
+      });
     }
 
     // Parse the form data
@@ -27,7 +42,7 @@ async function handleRequest(request) {
     if (!file) {
       return new Response(JSON.stringify({ success: false, errorcode: 400, description: 'No input file(s)' }), {
         status: 400,
-        headers: { 'Content-Type': 'application/json' },
+        headers: headers,
       });
     }
 
@@ -43,13 +58,13 @@ async function handleRequest(request) {
       console.log('📤 File uploaded successfully:', uploadedUrl);
       return new Response(JSON.stringify({ success: true, data: uploadedUrl }), {
         status: 200,
-        headers: { 'Content-Type': 'application/json' },
+        headers: headers,
       });
     } else {
       console.log('📨 Uguu response error:', response);
       return new Response(JSON.stringify(response), {
         status: response.errorcode || 500,
-        headers: { 'Content-Type': 'application/json' },
+        headers: headers,
       });
     }
 
@@ -57,7 +72,7 @@ async function handleRequest(request) {
     console.log('Error:', err);
     return new Response(JSON.stringify({ success: false, errorcode: 500, description: "Upload failed: " + err.message }), {
       status: 500,
-      headers: { "Content-Type": "application/json" },
+      headers: headers,
     });
   }
 }
