@@ -1,62 +1,78 @@
-export default {
-  async fetch(request) {
-    console.log("🚀 New request:", request.method, request.url);
+/**
+ * Cloudflare Worker to handle file uploads, process them, and send them to Uguu.
+ */
+addEventListener('fetch', event => {
+  event.respondWith(handleRequest(event.request));
+})
 
-    if (request.method !== "POST") {
-      return new Response("Method Not Allowed", { status: 405 });
+async function handleRequest(request) {
+  try {
+    // Only accept POST requests
+    if (request.method !== 'POST') {
+      return new Response('Method Not Allowed', { status: 405 });
     }
 
-    try {
-      const contentType = request.headers.get("content-type") || "";
-      if (!contentType.includes("multipart/form-data")) {
-        console.log("❌ Not multipart/form-data:", contentType);
-        return new Response("Expected multipart/form-data", { status: 400 });
-      }
+    // Parse the form data
+    const formData = await request.formData();
+    const file = formData.get('file');
 
-      const formData = await request.formData();
-      const file = formData.get("file");
-
-      if (!file || typeof file.arrayBuffer !== "function") {
-        console.log("❌ No file found in formData or not a valid file");
-        return new Response(
-          JSON.stringify({ success: false, description: "No valid file in upload" }),
-          { status: 400 }
-        );
-      }
-
-      console.log("📦 File received:", file.name, file.type, file.size);
-
-      const uploadFormData = new FormData();
-      uploadFormData.append("files[]", file.stream(), file.name);
-
-      console.log("👀 Incoming form fields:");
-      for (const [name, value] of uploadFormData.entries()) {
-        console.log(" -", name, typeof value === "object" ? value.name : value);
-      }
-
-      console.log("📤 Sending to Uguu...");
-      const uguuResponse = await fetch("https://uguu.se/upload.php", {
-        method: "POST",
-        body: uploadFormData,
+    // Ensure that a file has been provided
+    if (!file) {
+      return new Response(JSON.stringify({ success: false, errorcode: 400, description: 'No input file(s)' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
       });
-
-      const uguuText = await uguuResponse.text();
-      console.log("📨 Uguu raw response text:", uguuText);
-
-      return new Response(JSON.stringify({
-        success: true,
-        status: uguuResponse.status,
-        data: uguuText
-      }), {
-        headers: { "Content-Type": "application/json" }
-      });
-
-    } catch (err) {
-      console.log("🔥 Error during upload:", err.stack || err.message);
-      return new Response(
-        JSON.stringify({ success: false, error: err.message }),
-        { status: 500, headers: { "Content-Type": "application/json" } }
-      );
     }
+
+    // Log received file details for debugging
+    console.log('📦 File received:', file.name, file.type, file.size);
+
+    // Send the file to Uguu for hosting
+    const response = await sendToUguu(file);
+
+    // Return the result
+    if (response.success) {
+      console.log('📤 File uploaded successfully:', response.data);
+      return new Response(JSON.stringify({ success: true, data: response.data }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    } else {
+      console.log('📨 Uguu response error:', response);
+      return new Response(JSON.stringify(response), {
+        status: response.errorcode || 500,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+  } catch (err) {
+    console.error('Error:', err);
+    return new Response('Internal Server Error', { status: 500 });
+  }
+}
+
+/**
+ * Sends the file to Uguu for hosting and returns the response.
+ *
+ * @param {File} file - The file to upload
+ * @returns {Object} - The response from Uguu
+ */
+async function sendToUguu(file) {
+  const formData = new FormData();
+  formData.append("files[]", file.stream(), file.name);
+
+  try {
+    const response = await fetch("https://uguu.se/upload.php", {
+      method: "POST",
+      body: formData,
+    });
+
+    const text = await response.text();
+    console.log("📨 Uguu raw response text:", text);
+
+    return JSON.parse(text);
+  } catch (error) {
+    console.error("Error uploading file to Uguu:", error);
+    return { success: false, errorcode: 500, description: "Error uploading to Uguu" };
   }
 }
