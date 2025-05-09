@@ -56,7 +56,7 @@ async function handleRequest(request) {
     if (response.success && Array.isArray(response.files) && response.files.length > 0) {
       const uploadedUrl = response.files[0].url;
       console.log('📤 File uploaded successfully:', uploadedUrl);
-      return new Response(JSON.stringify({ success: true, data: uploadedUrl }), {
+      return new Response(JSON.stringify({ success: true, files: [{ url: uploadedUrl }] }), {
         status: 200,
         headers: headers,
       });
