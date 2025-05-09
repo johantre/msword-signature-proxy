@@ -1,0 +1,22 @@
+name: Tail Cloudflare Worker Logs
+
+on:
+  workflow_dispatch:
+
+jobs:
+  tail-logs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch Worker Logs
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: 9581dc4a910dc7be926a65d026ddb128
+          SCRIPT_NAME: msword-signature-proxy
+        run: |
+          echo "📡 Fetching latest logs for $SCRIPT_NAME..."
+
+          curl -s -X POST "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/workers/scripts/${SCRIPT_NAME}/tail" \
+            -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            -H "Content-Type: application/json" \
+            -d '{"sample": 1}' \
+            | jq
