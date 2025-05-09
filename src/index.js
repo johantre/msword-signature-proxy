@@ -26,13 +26,13 @@ export default {
 
       console.log("📦 File received:", file.name, file.type, file.size);
 
-      const forwardFormData = new FormData();
-      forwardFormData.append("file", file, file.name);
+      const uploadFormData = new FormData();
+      uploadFormData.append("files[]", file.stream(), file.name);
 
       console.log("📤 Sending to Uguu...");
       const uguuResponse = await fetch("https://uguu.se/upload.php", {
         method: "POST",
-        body: forwardFormData,
+        body: uploadFormData,
       });
 
       const uguuText = await uguuResponse.text();
