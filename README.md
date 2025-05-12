@@ -1,4 +1,4 @@
-# msword-signature-proxy
+# MSWord Signature Proxy
 
 Cloudflare Worker acting as a proxy to avoid CORS issues when uploading signature images to services like https://uguu.se.
 
