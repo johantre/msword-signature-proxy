@@ -1,6 +1,7 @@
 # MSWord Signature Proxy
 
-Cloudflare Worker acting as a proxy to avoid CORS issues when uploading signature images to services like https://uguu.se.\
+Cloudflare Worker acting as a proxy to avoid CORS issues when uploading signature images to https://uguu.se.\
+https://uguu.se does not provide specific headers in their response like CORS headers, hence the issues in the browser console.\
 Purpose is to call the proxy worker https://msword-signature-proxy.johan-tre.workers.dev/ with the requested form data instead of directly https://uguu.se with the form data.\
 The worker adds the necessary headers to avoid CORS issues.\
 
