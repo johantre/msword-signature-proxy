@@ -6,7 +6,7 @@ Cloudflare Worker acting as a proxy to avoid CORS issues when uploading signatur
 [More info on CORS-headers](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS).\
 Purpose is to call the proxy worker https://msword-signature-proxy.johan-tre.workers.dev/ with the requested form data instead of directly https://uguu.se with the form data.\
 \
-The worker adds the necessary headers to avoid CORS issues.
+The worker adds the necessary headers in the response to avoid CORS issues.
 
 ## ⚠️Dependencies⚠️
 - Cloudflare services
